@@ -1,4 +1,5 @@
 import { laserAudio } from '../../Audio'
+import { Engine } from '../../Engine';
 import { IPoint } from '../../Helpers'
 import { GameEntity } from './GameEntity'
 import { Ship } from './Ship'
@@ -9,15 +10,16 @@ export class LaserBeam extends GameEntity {
 	// Needed to know who owns the laserbeam when it hits something
 	public owner: Ufo | Ship;
 	private audioDone: boolean = false;
-	private startTime: number;
-	private startPosition: IPoint;
+	private startTime: number = 0;
+	private startPosition: IPoint = {x:0, y:0};
 
-	public constructor(init?:Partial<LaserBeam>) {
-		super(init);
+	public constructor(engine: Engine, direction: number, owner: Ufo | Ship, position: IPoint) {
+		super(engine);
+		this.owner = owner;
 		this.name = 'laserbeam';	
-		this.direction = this.direction || 1;
+		this.direction = direction;
 		this.color = "#FFF";
-		this.position = this.position || {x:0, y:0};
+		this.position = position;
 		this.model = [
 			{x: -20, y: -5, w: 40, h: 10}
 		];

@@ -1,3 +1,4 @@
+import { Engine } from '../../Engine';
 import {EntityBase} from '../../Entity'
 
 export class ScoreBar extends EntityBase {
@@ -7,8 +8,8 @@ export class ScoreBar extends EntityBase {
 	public finished: boolean = false;
 	public color: string = '#00F';
 
-	public constructor(init?:Partial<ScoreBar>){
-		super(init);
+	public constructor(engine: Engine){
+		super(engine);
 		this.position = {
 			x: this.engine.width / 2 , 
 			y: this.engine.height - 36, 

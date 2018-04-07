@@ -33,17 +33,17 @@ export class Engine {
 	public canvasColor: string = '#000';
 	public logic: IEntity;
 	public readonly touchable: boolean = false; // 'createTouch' in document; // is this running in a touch capable environment?
-	public controller: IController;
 	public entities: IEntity[] = [];
 	public canvas: HTMLCanvasElement;
 	public renderer: IRenderer;
+	public controller: IController;
 	private pageColor: string = '#000';
 	private startTime: number = new Date().getTime();
 	
 	public constructor(){
 		// Disable selection of text/elements in the browser
 		document.onselectstart = () => false;
-		// Disable the browser contet meny
+		// Disable the browser contet menu
 		document.body.oncontextmenu = () => false;
 		document.body.style.background = this.pageColor;
 		// Canvas element for rendering visuals
@@ -51,11 +51,12 @@ export class Engine {
 		document.body.appendChild(this.canvas);
 		this.canvas.style.position = 'absolute';
 		this.canvas.style.backgroundColor = '#000';
+		this.controller = this.touchable ? new TouchController(this) : new MouseController(this);
+		this.renderer = new CanvasRenderer(this);
 		// Time as number
 		this.startTime = new Date().getTime();
-		this.logic = new BallBrickerLogic(this);
+		this.logic = new SandBoxLogic(this);
 		this.add(this.logic);
-		this.initializeController();
 		this.animate();
 	}
 
@@ -94,10 +95,6 @@ export class Engine {
 		this.logic.initialized = false;
 	}
 
-	private initializeController(){
-		this.controller = this.touchable ? new TouchController(this) : new MouseController(this);
-	}
-
 	private updateEntities (time: number){
 		for(const e of this.entities){
 			e.update(time);
@@ -124,9 +121,6 @@ export class Engine {
 			this.animate();
 		});
 		this.update();
-		if(this.renderer == null){
-			this.renderer = new CanvasRenderer(this);
-		}
 		this.renderer.render();
 	}
 }

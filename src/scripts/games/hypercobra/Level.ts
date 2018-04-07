@@ -3,7 +3,7 @@ import {IRectangle} from '../../Helpers'
 
 export class Level extends EntityBase {
 
-    private combinedWidth: number;
+    private combinedWidth: number = 0;
 
     public update(time:number){
         if(this.position.x > this.combinedWidth){
@@ -19,7 +19,7 @@ export class Level extends EntityBase {
                 const randomHeight = randomHeightBlockCount * 100;
                 let randomTop = this.random(0, 6 - randomHeightBlockCount) * 100;
                 // get previous rect
-                var previous = this.model[this.model.length - 1];
+                const previous = this.model[this.model.length - 1];
                 if(previous){
                     if(previous.y >= randomHeight + randomTop){
                         randomTop = (previous.y - randomHeight) + 100;

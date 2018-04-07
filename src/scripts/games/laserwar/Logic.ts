@@ -34,8 +34,17 @@ export class Logic extends EntityBase {
 
 	public constructor(engine: Engine){
 		super(engine);
+		this.menu = new Menu(this.engine, {
+			engine: this.engine,
+			mainMenu
+		});
+		this.engine.add(this.menu);
+		this.menu.setItems(mainMenu);
+		this.scoreBar = new ScoreBar(this.engine);
+		this.engine.add(this.scoreBar);
 		this.initialized = false;
 		this.name = 'rules';
+		this.gameState = this.getDefaultGameState();
 		engine.canvasColor = '#000';
 		document.addEventListener("keyup", this.keyboardHandler.bind(this), false);
 	}
@@ -86,22 +95,20 @@ export class Logic extends EntityBase {
 		
 		// Randomly create UFOs when they do not exist
 		if((!(this.gameState.player3) || (this.gameState.player3 && this.gameState.player3.finished)) && 6 === Math.floor(Math.random()*200)){
-			this.engine.add( this.gameState.player3 = new Ufo({
-				colorIndex  : 2,
-				direction   : -1,
-				name        : 'Player 3',
-				position    : { x: this.engine.width - 40, y : 10 },
-				type        : 'computer'
-			}));		
+			this.engine.add( this.gameState.player3 = new Ufo( 
+				this.engine,
+				2, 
+				'Player 3',
+				{ x: this.engine.width - 40, y : 10 }
+			));		
 		}
 		if((!(this.gameState.player4) || (this.gameState.player4 && this.gameState.player4.finished)) && 6 === Math.floor(Math.random()*200)){
-			this.engine.add( this.gameState.player4 = new Ufo({
-				colorIndex  : 4,
-				direction   : -1,
-				name        : 'Player 4',
-				position    : { x: 10, y : (this.engine.height - 50 - this.barHeight) },
-				type        : 'computer'
-			}));		
+			this.engine.add( this.gameState.player4 = new Ufo(
+				this.engine,
+				4,
+				'Player 4',
+				{ x: 10, y : (this.engine.height - 50 - this.barHeight) }
+			));		
 		}
 	}
 
@@ -128,58 +135,57 @@ export class Logic extends EntityBase {
 		}
 	}
 
+	private getDefaultGameState(): GameState{
+		return new GameState(
+			new Ship ( 
+				this.engine, 
+				0, 
+				1, 
+				'Player 1', 
+				{ x: 10, y : 10 },
+				(this.playerCount === 0 ? 'computer' : 'player')
+			),
+			new Ship (
+				this.engine,
+				3,
+				-1,
+				'Player 2',
+				{ x: this.engine.width - 40, y : (this.engine.height - 50 - this.barHeight) },
+				( this.playerCount !== 2 ? 'computer' : 'player')
+			) 
+		);
+	}
+
 	private initialize (){
 		this.previousRightButtonDown = false;
 		this.initialized = true;
 		this.engine.canvasColor = '#000';
-		this.gameState = new GameState();
-		this.scoreBar = new ScoreBar({ engine: this.engine });
+		this.gameState = this.getDefaultGameState();
+		this.scoreBar = new ScoreBar(this.engine);
 		this.engine.add(this.scoreBar);
-		if(!this.menu){
-			this.menu = new Menu({
-				engine: this.engine,
-				mainMenu
-			});
-			this.engine.add(this.menu);
-			this.menu.setItems(mainMenu);
-		}
 		// Player 1
-		this.engine.add( this.gameState.player1Ship = new Ship ({
-			colorIndex  : 0,
-			direction   : 1,
-			engine: this.engine,
-			name: 'Player 1',
-			position    : { x: 10, y : 10 },
-			type: (this.playerCount === 0 ? 'computer' : 'player')
-		}) );
+		this.engine.add( this.gameState.player1Ship );
 		// Player 2
-		this.engine.add( this.gameState.player2Ship = new Ship ({
-			colorIndex  : 3,
-			direction   : -1,
-			engine: this.engine,
-			name: 'Player 2',
-			position    :{ x: this.engine.width - 40, y : (this.engine.height - 50 - this.barHeight) },
-			type: (this.playerCount !== 2 ? 'computer' : 'player'),
-		}) );
+		this.engine.add( this.gameState.player2Ship );
 		// Stars 
-		this.engine.add( new Star({
-			bottomOffset	: this.barHeight,
-			colorIndex  	: 0,
-			direction   	: -1,
-			name        	: 'Star 1',
-			position    	: { x: this.engine.width / 2, y : (this.engine.height * 0.25) - this.barHeight },
-			starId			: 0,
-			type        	: 'star'
-		}) );
-		this.engine.add( new Star({
-			bottomOffset	: this.barHeight,
-			colorIndex  	: 3,
-			direction   	: -1,
-			name        	: 'Star 2',
-			position    	: { x: (this.engine.width / 2) , y : (this.engine.height * 0.75) - this.barHeight },
-			starId			: 5,
-			type        	: 'star'
-		}) );
+		this.engine.add( new Star(
+			this.engine,
+			this.barHeight,
+			0,
+			'Star 1',
+			{ x: this.engine.width / 2, y : (this.engine.height * 0.25) - this.barHeight },
+			0,
+			0
+		));
+		this.engine.add( new Star(
+			this.engine,
+			this.barHeight,
+			3,
+			'Star 2',
+			{ x: (this.engine.width / 2) , y : (this.engine.height * 0.75) - this.barHeight },
+			5,
+			0
+		) );
 	}
 
 	// Checks to see if the players mouse pointer is over a star
@@ -200,14 +206,15 @@ export class Logic extends EntityBase {
 		if(playerShip.finished && ((button && type === 'player') || type === 'computer') ){
 			const shipStar = this.getStar(playerShip, (type === 'player'), position);
 			if(shipStar){
-				result = new Ship({
-					colorIndex,
+				result = new Ship(
+					this.engine, 
+					colorIndex, 
 					direction,
 					name,
 					position,
-					spawnStar	: shipStar,
-					type
-				});
+					type,
+					shipStar
+				);
 				this.engine.add( result );
 			}
 		}

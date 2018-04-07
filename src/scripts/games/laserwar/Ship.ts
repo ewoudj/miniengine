@@ -1,4 +1,5 @@
 import { appearAudio } from '../../Audio';
+import { Engine } from '../../Engine';
 import { EntityBase } from '../../Entity';
 import { distance, IPoint, IRectangle } from '../../Helpers';
 import { heuristic } from './ai/Heuristic';
@@ -11,9 +12,9 @@ import { Ufo } from './Ufo';
 
 export class Ship extends GameEntity { 
 
-	public spawnStar: Star;
+	public spawnStar?: Star;
 	public collisionRect: IRectangle = {x: -15, y: -10, w: 30,h: 20};
-	public shoot: boolean;
+	public shoot: boolean = false;
 	private laserState: number;
 	private speed: number = 3;
 	private invulerability: number = 1000;
@@ -29,16 +30,18 @@ export class Ship extends GameEntity {
 		{x: -20, y: -5, w: 30, h: 10},
 		{x: 0, y: 5, w: 20, h: 10}
 	];
-	private lastTimeCalled: number;
+	private lastTimeCalled: number = 0;
 
-	public constructor(init?:Partial<Ship>) {
-		super(init);
-		this.type = this.type || 'player'; // player, computer
+	public constructor(engine: Engine, colorIndex: number, direction: number, name: string, position: IPoint, type: 'computer' | 'player' | 'star', spawnStar?: Star) {
+		super(engine);
+		this.colorIndex = colorIndex;
+		this.type = type; // player, computer
 		this.laserState = 300; // 10 = ready, 0 = charging
-		this.direction = this.direction || 1;
-		this.color = colors[this.colorIndex] || this.color || "#FFF";
-		this.name = this.name || 'ship';
-		this.position = this.position || {x:0, y:0};
+		this.direction = direction;
+		this.color = colors[colorIndex];
+		this.name = name;
+		this.position = position;
+		this.spawnStar = spawnStar;
 	}
 
 	public update (time: number){
@@ -77,9 +80,7 @@ export class Ship extends GameEntity {
 	}
 
 	public onRemove (){
-		this.engine.add(new Explosion({
-			position: this.position
-		}));
+		this.engine.add(new Explosion(this.engine, this.position));
 	}
 
 	private getTimeDelta (time: number): number{
@@ -107,11 +108,12 @@ export class Ship extends GameEntity {
 		if(this.shoot && this.laserState >= 300){
 			this.laserState = 0;
 			this.gunOffset.x = this.direction === 1 ? 40 : -40;
-			this.engine.add(new LaserBeam({
-				direction: this.direction,
-				owner: this,
-				position: {x:this.position.x + this.gunOffset.x, y:this.position.y + this.gunOffset.y}
-			}));
+			this.engine.add(new LaserBeam(
+				this.engine, 
+				this.direction, 
+				this,
+				{x:this.position.x + this.gunOffset.x, y:this.position.y + this.gunOffset.y}
+			));
 		}
 		else if(this.laserState < 300){
 			this.laserState = this.laserState + timeDelta;

@@ -1,5 +1,5 @@
 import { Engine } from "../../Engine"
-import { EntityBase, IEntity } from "../../Entity"
+import { EntityBase, IEntity, IText } from "../../Entity"
 import { inflateRectangle, IPoint, pointInRect, rectInRect } from '../../Helpers';
 import { Menu } from '../../Menu'
 import { Ball } from "./Ball"
@@ -53,6 +53,19 @@ export class Logic extends EntityBase {
         this.activeLogic = this.gameLogic;
 		this.initialized = false;
         this.name = 'logic';
+        this.menu = new Menu(engine, {
+            alignment: 'center',
+            engine: this.engine,
+            font: 'HeavyData',
+            mainMenu,
+            position: {
+                x: 0,
+                y: 0
+            }
+        });
+        this.engine.add(this.menu);
+        this.menu.setItems(mainMenu);
+        this.logo = this.engine.add(new Logo(this.engine));
         document.addEventListener("keydown", this.keyboardDownHandler.bind(this), false);
         document.addEventListener("keyup", this.keyboardUpHandler.bind(this), false);
     }
@@ -63,6 +76,7 @@ export class Logic extends EntityBase {
             this.initialized = true;
         }
         this.activeLogic.update(time);
+        this.texts = this.activeLogic.texts;
     }
 
     public render(context: CanvasRenderingContext2D): void {
@@ -114,16 +128,27 @@ export class Logic extends EntityBase {
             // assume it is an object that has been stringified
             let level = new Level();
             if (stringFromStore) {
-                level = JSON.parse(stringFromStore) as Level;
+                try {
+                    level = JSON.parse(stringFromStore) as Level;
+                }
+                catch(error){
+                    // Parse error, corrupt level, implement some notification mechanism
+                    level = this.createNewLevel(level);
+                }
             }
             else {
-                level = new Level();
-                level.bricks = this.createBorderBricks();
+                level = this.createNewLevel(level);
             }
             for(const b of level.bricks){
-                this.engine.add(new Brick(b));
+                this.engine.add(new Brick(this.engine, b));
             }
         }
+    }
+
+    private createNewLevel(level: Level) {
+        level = new Level();
+        level.bricks = this.createBorderBricks();
+        return level;
     }
 
     private createBorderBricks(): IBrickDTO[] {
@@ -169,26 +194,6 @@ export class Logic extends EntityBase {
         this.engine.canvasColor = '#000';
         this.engine.entities = [];
         this.engine.add(this);
-        if(!this.menu){
-			this.menu = new Menu({
-                alignment: 'center',
-                engine: this.engine,
-                font: 'HeavyData',
-                mainMenu,
-                position: {
-                    x: 0,
-                    y: 0
-                }
-			});
-			this.engine.add(this.menu);
-			this.menu.setItems(mainMenu);
-        }
-        if(!this.logo){
-            this.logo = this.engine.add(new Logo());
-        }
-        else {
-            this.engine.add(this.logo);
-        }
         this.activeLogic.initialize(time);
     }
 
@@ -202,10 +207,10 @@ export class Logic extends EntityBase {
 }
 
 export interface ILogic {
+    texts: IText[],
     initialize(time: number): void,
     update(time: number): void,
     keyboardDownHandler (evt: KeyboardEvent): void,
-    keyboardUpHandler (evt: KeyboardEvent): void,
-    
+    keyboardUpHandler (evt: KeyboardEvent): void
 };
 

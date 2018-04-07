@@ -15,15 +15,15 @@ export class Menu extends EntityBase {
 	public fontSize: number = 50;
 	public lineSpacing: number = 10;
 	public topMost: boolean = true;
-	public mainMenu: IMenuItem[];
+	public mainMenu: IMenuItem[] = [];
 
 	private selectedColor: string = '#FFF';
 	private ignoreNextButtonUp: boolean = false;
-	private selected: IText | null;
-	private currentItems: IMenuItem[];
+	private selected: IText | null = null;
+	private currentItems: IMenuItem[] = [];
 
-	public constructor(init?:Partial<Menu>){
-		super(init);
+	public constructor(engine:Engine, init:Partial<Menu>){
+		super(engine);
 		Object.assign(this, init);	
 		this.setItems(this.mainMenu);
 	}

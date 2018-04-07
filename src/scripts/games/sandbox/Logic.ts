@@ -5,22 +5,20 @@ import { TextEntity } from './Text'
 
 export class Logic extends EntityBase {
 
-    private startTime: number;
+    private startTime: number = 0;
 
     public update (time: number){
         if(!this.initialized){
             this.engine.canvasColor = '#000';
             this.startTime = time;
             for(let c = 0, l = 100; c < l ; c++){
-                this.engine.add(new Ship({
-                    position: {
+                this.engine.add(new Ship(this.engine, {
                         x: this.engine.width / 2,
                         y: this.engine.height / 2
                     } 
-                }));
+                ));
             }
-            this.engine.add(new TextEntity({
-                texts: [{
+            this.engine.add(new TextEntity(this.engine ,[{
                     alignment: 'start',
                     color: '#FFF',
                     font: 'CBM64',
@@ -31,7 +29,7 @@ export class Logic extends EntityBase {
                     },
                     size: 50
                 }]
-            }));               
+            ));               
             this.initialized = true;
         }
         let i = 0;

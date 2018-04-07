@@ -4,8 +4,8 @@ import { IRectangle } from '../../Helpers'
 
 export class Ship extends EntityBase { 
 	
-	public constructor(init?:Partial<Ship>) {
-		super(init);
+	public constructor(engine:Engine) {
+		super(engine);
 		this.model = [
 			{x: -20, y: -15, w: 20, h: 10},
 			{x: -10, y: -5, w: 30, h: 10},

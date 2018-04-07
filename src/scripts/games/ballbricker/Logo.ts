@@ -9,8 +9,14 @@ export class Logo extends EntityBase {
 	private memoryScale: number = 0;
     private stars: IPoint[];
 
-	public constructor(init?:Partial<Logo>) {
-        super(init);
+	public constructor(engine: Engine) {
+        super(engine);
+        this.stars = [];
+        let j = 0;
+        while(j< 200){
+            this.stars.push(this.newStar());
+            j++;
+        }
     }
 
     public show () {
@@ -128,14 +134,6 @@ export class Logo extends EntityBase {
     }
 
     private renderStars(context: CanvasRenderingContext2D): void{
-        if(this.stars === undefined){
-            this.stars = [];
-            let j = 0;
-            while(j< 200){
-                this.stars.push(this.newStar());
-                j++;
-            }
-        }
         context.lineWidth = 4 * this.engine.renderer.scale;
         context.beginPath();
         let i=0;

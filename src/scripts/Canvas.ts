@@ -6,12 +6,13 @@ export class CanvasRenderer {
 	
 	public offsetLeft: number = 0;
 	public offsetTop: number = 0;
-	public scale: number;
+	public scale: number = 1;
     private engine: Engine;
     private context: CanvasRenderingContext2D;
 
 	public constructor(engine: Engine){
-        this.engine = engine;
+		this.engine = engine;
+		this.context = this.engine.canvas.getContext('2d') as CanvasRenderingContext2D;
 		window.onresize = this.resize.bind(this);
 		this.resize();
 	}
@@ -51,7 +52,6 @@ export class CanvasRenderer {
 			this.offsetTop = 40;
 		}
 		this.offsetLeft = Math.ceil((this.engine.canvas.width - (this.engine.width * this.scale)) / 2);
-		this.context = canvas.getContext('2d') as CanvasRenderingContext2D;
 		this.engine.controller.resize();
 	}
 	

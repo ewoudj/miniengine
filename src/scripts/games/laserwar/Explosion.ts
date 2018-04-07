@@ -1,6 +1,7 @@
 import {explosionAudio} from '../../Audio'
+import {Engine} from '../../Engine';
 import {EntityBase} from '../../Entity'
-import {IRectangle, rotate} from '../../Helpers'
+import {IPoint, IRectangle, rotate} from '../../Helpers'
 
 const rect: IRectangle = {x: -5, y: -5, w: 10, h: 10};
 
@@ -9,10 +10,10 @@ export class Explosion extends EntityBase {
 	private duration: number = 0;
 	private audioDone: boolean = false;
 
-	public constructor(init?:Partial<Explosion>){
-		super(init);
+	public constructor(engine: Engine, position: IPoint){
+		super(engine);
 		this.color = "#FFF";
-		this.position = this.position || {x:0, y:0};
+		this.position = position;
 		this.audioDone = false;
 	}
 

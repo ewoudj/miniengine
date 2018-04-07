@@ -1,52 +1,39 @@
 import { Engine } from '../../Engine';
+import { IText } from '../../Entity';
 import { inflateRectangle, IPoint, pointInRect, rectInRect } from '../../Helpers';
 import { Ball } from './Ball';
 import { Brick } from './Brick';
 import { colors, ILogic, Logic } from './Logic';
 
+const brickwidth = 50;
+const brickHeight = 20;
+const ballSize = 18;
+const batSize = 100;
+
 export class GameLogic implements ILogic {
 
     public ball: Ball;
     public bat: Brick;
+    public texts: IText[] = [];
     private moveLeft: boolean = false;
     private moveRight: boolean = false;
-    private startTime: number;
-    private lastTimeCalled: number;
+    private startTime: number = 0;
+    private lastTimeCalled: number = -1;
     private engine: Engine;
-    private previousControllerPosition: IPoint;
+    private previousControllerPosition: IPoint = {x: 0, y: 0};
     private level: number = 1;
     private batSpeed: number = 0;
     private maxBatSpeed: number = 10;
+
     public constructor(engine: Engine){
         this.engine = engine;
+        this.ball = new Ball(this.engine);
+        this.bat = new Brick(this.engine);
     }
 
     public initialize(time: number):void {
         this.startTime = time;
-        const brickwidth = 50;
-        const brickHeight = 20;
-        const ballSize = 18;
-        const batSize = 100;
-        // Create the ball
-        this.ball = this.engine.add(new Ball({
-            color: '#FFF',
-            position: {
-                x: this.engine.width / 2,
-                y: this.engine.height - 100
-            }
-        }));
-        // Create the bat
-        this.bat = this.engine.add(new Brick({
-            kind: 'Bat',
-            color: '#FFF',
-            height: 18,
-            indestructable: true,
-            position: {
-                x: (this.engine.width - batSize) / 2,
-                y: this.engine.height - 50
-            },
-            width: batSize
-        }));
+        this.createDefaultBallAndBat();
         (this.engine.logic as Logic).loadLevel(this.level);
     }
     
@@ -111,36 +98,44 @@ export class GameLogic implements ILogic {
             }
         }
         const movement = 300 / (500 / delta);
-        if(this.moveLeft && this.batSpeed > -this.maxBatSpeed){
-            this.batSpeed--;
-        }
-        if(this.moveRight && this.batSpeed < this.maxBatSpeed){
-            this.batSpeed++;
-        }
-        if(!this.moveLeft && !this.moveRight){
-            if(this.batSpeed > 0){
-                this.batSpeed--;
-            }
-            if(this.batSpeed < 0){
-                this.batSpeed++;
-            }
-        }
-        if(this.batSpeed > 0){
-            this.correctBatMovingRight();
-        }
-        if(this.batSpeed < 0){
-            this.correctBatMovingLeft();
-        }
-        this.bat.position.x += this.batSpeed;
-        
-        if(pointInRect(this.ball.position, this.bat.position, inflateRectangle( {h: this.bat.height, w: this.bat.width, x: 0, y: 0}, this.ball.radius))){
-            if(this.moveLeft && !this.moveRight){
-                this.ball.position.x -= movement;
-            }
-            else if (!this.moveLeft && this.moveRight){
-                this.ball.position.x += movement;
-            }
-        }
+        // for (const e of this.engine.entities) {
+        //    if(e instanceof Brick && e.kind === 'Bat'){
+                // Acceleration and deceleration
+                if(this.moveLeft && this.batSpeed > -this.maxBatSpeed){
+                    this.batSpeed--;
+                }
+                if(this.moveRight && this.batSpeed < this.maxBatSpeed){
+                    this.batSpeed++;
+                }
+                if(!this.moveLeft && !this.moveRight){
+                    if(this.batSpeed > 0){
+                        this.batSpeed--;
+                    }
+                    if(this.batSpeed < 0){
+                        this.batSpeed++;
+                    }
+                }
+                this.bat.position.x += this.batSpeed;
+                // Handles bat colliding with bricks
+                if(this.batSpeed > 0){
+                    this.correctBatMovingRight();
+                }
+                if(this.batSpeed < 0){
+                    this.correctBatMovingLeft();
+                }
+                
+
+                // This is supposed to correct the situation when , after moving, the bat overlaps the ball
+                if(pointInRect(this.ball.position, this.bat.position, inflateRectangle( {h: this.bat.height, w: this.bat.width, x: 0, y: 0}, this.ball.radius))){
+                    if(this.moveLeft && !this.moveRight){
+                        this.ball.position.x -= movement;
+                    }
+                    else if (!this.moveLeft && this.moveRight){
+                        this.ball.position.x += movement;
+                    }
+                }
+            // }
+        // }
     }
     
     public keyboardDownHandler (evt: KeyboardEvent) : void {
@@ -184,6 +179,29 @@ export class GameLogic implements ILogic {
         if (keyCode === 39) {
             this.moveRight = false;
         }
+    }
+
+    private createDefaultBallAndBat() {
+        // Create the ball
+        this.ball = this.engine.add(new Ball( this.engine, {
+            color: '#FFF',
+            position: {
+                x: this.engine.width / 2,
+                y: this.engine.height - 100
+            }
+        }));
+        // Create the bat
+        this.bat = this.engine.add(new Brick( this.engine, {
+            kind: 'Bat',
+            color: '#FFF',
+            height: 18,
+            indestructable: true,
+            position: {
+                x: (this.engine.width - batSize) / 2,
+                y: this.engine.height - 50
+            },
+            width: batSize
+        }));
     }
 
     private getBatCollisions(): Brick[] {

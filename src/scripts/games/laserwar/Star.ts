@@ -1,4 +1,5 @@
 import { changeColorAudio } from '../../Audio'
+import { Engine } from '../../Engine';
 import { IPoint, rotate } from '../../Helpers'
 import { GameEntity } from './GameEntity'
 import { LaserBeam } from './LaserBeam'
@@ -10,21 +11,35 @@ const subSpeed = 0.5;
 export class Star extends GameEntity { 
 	
 	public starId: number;
-	public parent: Star;
+	public parent?: Star;
 	public bottomOffset: number = 30;
 	public angle: number;
 	private previousColor: string;
 	private parentCenter: IPoint;
 	private parentOriginalPosition: IPoint;
-	private makeSound: boolean;
+	private makeSound: boolean = false;
 
-	public constructor(init?:Partial<Star>) {
-		super(init);
+	public constructor(engine: Engine, bottomOffset: number, colorIndex: number, 
+		name: string, position: IPoint, starId: number, angle: number, parent?: Star) {
+		super(engine);
+		this.bottomOffset = bottomOffset;
+		this.name = name;
 		this.type = 'star';
-		this.color = colors[this.colorIndex] || this.color || "#FFF";
+		this.colorIndex = colorIndex;
+		this.color = colors[colorIndex];
 		this.previousColor = this.color;
-		this.position = this.position || {x:0, y:0};
-		this.angle = this.angle || 0;
+		this.position = position;
+		this.starId = starId;
+		this.parent = parent;
+		this.angle = angle;
+		this.parentCenter = { 
+			x: this.engine.width / 2, 
+			y: (this.engine.height / 2) - this.bottomOffset
+		};
+		this.parentOriginalPosition = { 
+			x: this.engine.width / 2, 
+			y : (this.engine.height * 0.25) - this.bottomOffset
+		};
 		this.collisionRect = {x: -15, y: -15, w: 30,h: 30};
 		this.model = [
 			{x: -10, y: -20, w: 20, h: 10},
@@ -45,17 +60,15 @@ export class Star extends GameEntity {
 		if(!this.initialized){
 			if(!this.parent){
 				for(let i = 0; i < 4; i++){
-					this.engine.add( new Star({
-						angle			: 90 * i,
-						bottomOffset	: this.bottomOffset,
-						colorIndex  	: this.colorIndex,
-						direction   	: -1,
-						name        	: this.name + '.' + i,
-						parent			: this,
-						position    	: { x: this.position.x - 110, y: this.position.y },
-						starId			: this.starId + (i + 1),
-						type        	: 'star'
-					}) );
+					this.engine.add( new Star(
+						this.engine, 
+						this.bottomOffset, 
+						this.colorIndex, 
+						this.name + '.' + i, 
+						{ x: this.position.x - 110, y: this.position.y },  
+						this.starId + (i + 1),
+						90 * i, this
+					) );
 				}
 			}
 			this.initialized = true;
@@ -72,16 +85,6 @@ export class Star extends GameEntity {
 					break;
 				}
 			}
-		}
-		if(!this.parentCenter){
-			this.parentCenter = { 
-				x: this.engine.width / 2, 
-				y: (this.engine.height / 2) - this.bottomOffset
-			};
-			this.parentOriginalPosition = { 
-				x: this.engine.width / 2, 
-				y : (this.engine.height * 0.25) - this.bottomOffset
-			};
 		}
 		
 		// 0 is center star 1; 1, 2, 3, 4 are its sub-stars

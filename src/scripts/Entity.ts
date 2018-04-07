@@ -45,8 +45,8 @@ export abstract class EntityBase {
 	public color: string = 'rgba(0,0,0,0)';
 	public texts: IText[] = [];
 
-	public constructor(init?:Partial<EntityBase>){
-		Object.assign(this, init);
+	public constructor(engine: Engine){
+		this.engine = engine;
 	}
 
 	public render(context: CanvasRenderingContext2D): void{

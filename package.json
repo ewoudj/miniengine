@@ -1,7 +1,7 @@
 {
-  "name": "game3",
+  "name": "miniengine",
   "version": "0.0.0",
-  "description": "game3",
+  "description": "A web based, minimalist game engine.",
   "main": "index.js",
   "scripts": {
     "start": "webpack-dev-server",

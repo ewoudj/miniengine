@@ -1,4 +1,5 @@
 import { appearAudio } from '../../Audio'
+import { Engine } from '../../Engine';
 import { distance, IPoint, IRectangle } from '../../Helpers'
 import { heuristic } from './ai/Heuristic';
 import { Explosion } from './Explosion';
@@ -36,7 +37,7 @@ export class Ufo extends GameEntity {
 	
 	public direction: number = 1;
 	public collisionRect: IRectangle = {x: -20, y: -15, w: 40,h: 30};
-	public shoot: boolean;
+	public shoot: boolean = false;
 
 	private laserState: number = 10; // 10 = ready, 0 = charging
 	private audioDone:boolean = false;
@@ -45,14 +46,17 @@ export class Ufo extends GameEntity {
 	private nextFrame: boolean = false;
 	private gunOffset: IPoint =  {x:40, y:0};
 	private ufoFrame: number = 0;
-	private lastTimeCalled: number;
-	private lastTimeFrameChanged: number;
+	private lastTimeCalled: number = 0;
+	private lastTimeFrameChanged: number = 0;
 
-	public constructor(init?:Partial<Ufo>) {
-		super(init);
-		this.color = colors[this.colorIndex] || this.color || "#FFF";
-		this.name = this.name || 'ufo';
-		this.position = this.position || {x:0, y:0};
+	public constructor(engine: Engine, colorIndex: number, name: string, position: IPoint) {
+		super(engine);
+		this.colorIndex = colorIndex;
+		this.direction = -1;
+		this.name = name;
+		this.type = 'computer';
+		this.color = colors[colorIndex];
+		this.position = position;
 	}
 
 	public render (){
@@ -77,9 +81,7 @@ export class Ufo extends GameEntity {
 
 	public onRemove (){
 		// The server does not care about the explosion as it is just a visual
-		this.engine.add(new Explosion({
-			position: this.position
-		}));
+		this.engine.add(new Explosion(this.engine, this.position));
 	}
 
 	private getTimeDelta (time: number){
@@ -138,11 +140,12 @@ export class Ufo extends GameEntity {
 		if(this.shoot && this.laserState === 10){
 			this.laserState = -20;
 			this.gunOffset.x = this.direction === 1 ? 40 : -40;
-			this.engine.add(new LaserBeam({
-				direction: this.direction,
-				owner: this,
-				position: {x:this.position.x + this.gunOffset.x, y:this.position.y + this.gunOffset.y}
-			}));
+			this.engine.add( new LaserBeam( 
+				this.engine, 
+				this.direction, 
+				this,
+				{x:this.position.x + this.gunOffset.x, y:this.position.y + this.gunOffset.y}
+			));
 		}
 		else if(this.laserState !== 10){
 			this.laserState = this.laserState + 2;

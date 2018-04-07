@@ -9,15 +9,16 @@ const speed: number = 0.8;
 export class Ball extends EntityBase implements IDrawable{ 
 
     public radius: number = 9;
-    public width: number;
-    public height: number;
+    public width: number = 18;
+    public height: number = 18;
     public speed: IPoint = {x: 0, y: speed};
 
     private lastTimeCalled: number = 0;
 
-	public constructor(init?:Partial<Ball>) {
-		super(init);
+	public constructor(engine: Engine, init?:Partial<Ball>) {
+		super(engine);
         this.model = [];
+        Object.assign(this, init);
     }
 
     public update(time: number){
@@ -71,7 +72,10 @@ export class Ball extends EntityBase implements IDrawable{
 
     private correctPath(nearestIntersection: IIntersection) {
         const r = this.getCollisionRect(nearestIntersection.brick);
-        if (!nearestIntersection.brick.indestructable) {
+        if(nearestIntersection.brick.kind === 'Death'){
+            this.finished = true;
+        }
+        else if (!nearestIntersection.brick.indestructable && !this.finished) {
             nearestIntersection.brick.finished = true;
         }
         if (nearestIntersection.edge === 'TOP') {
