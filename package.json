@@ -10,7 +10,8 @@
     "prebuild": "npm run format",
     "build": "npm run clean && webpack --config ./webpack.prod.js",
     "test": "karma start",
-    "test-watch": "karma start --no-single-run --auto-watch"
+    "test-watch": "karma start --no-single-run --auto-watch",
+    "assets": "cd ./src/public && pwa-asset-generator ./icon.svg ./resources/images -i ./index.html -m ./manifest.json --background \"#000\""
   },
   "license": "ISC",
   "devDependencies": {
@@ -33,6 +34,7 @@
     "mini-css-extract-plugin": "^0.8.0",
     "node-sass": "^4.14.1",
     "prettier": "^1.18.2",
+    "pwa-asset-generator": "^3.2.3",
     "sass-loader": "^8.0.0",
     "ts-loader": "^6.2.0",
     "typescript": "^3.9.7",
