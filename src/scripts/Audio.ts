@@ -6,10 +6,13 @@ export function afterInput() {
   // originate there
   if (!firstInput) {
     firstInput = true;
-    const iOS = /(iPad|iPhone|iPod)/g.test(navigator.userAgent);
-    if (iOS) {
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    if (isSafari) {
       try {
         changeColorAudio.play();
+        appearAudio.play();
+        explosionAudio.play();
+        laserAudio.play();
       } catch (e) {}
     }
   }
@@ -65,9 +68,9 @@ interface ISound {
 }
 
 function initSound(url: string): ISound {
-  const audioContext = new AudioContext();
   const result = {
     init: () => {
+      const audioContext = new ((<any>window).AudioContext || (<any>window).webkitAudioContext)();
       loadSound(
         result.url,
         audioContext,
