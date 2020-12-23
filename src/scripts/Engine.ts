@@ -26,12 +26,22 @@ interface IController {
   resize(): void;
 }
 
+function isTouchDevice(): boolean {
+  if ("ontouchstart" in window || window.TouchEvent)
+      return true;
+
+  const prefixes = ["", "-webkit-", "-moz-", "-o-", "-ms-"];
+  const queries = prefixes.map(prefix => `(${prefix}touch-enabled)`);
+
+  return window.matchMedia(queries.join(",")).matches;
+}
+
 export class Engine {
   public width: number = 800;
   public height: number = 600;
   public canvasColor: string = '#000';
   public logic: IEntity;
-  public readonly touchable: boolean = false; // 'createTouch' in document; // is this running in a touch capable environment?
+  public readonly touchable: boolean = isTouchDevice();
   public entities: IEntity[] = [];
   public canvas: HTMLCanvasElement;
   public renderer: IRenderer;

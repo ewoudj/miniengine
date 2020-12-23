@@ -70,7 +70,8 @@ interface ISound {
 function initSound(url: string): ISound {
   const result = {
     init: () => {
-      const audioContext = new ((<any>window).AudioContext || (<any>window).webkitAudioContext)();
+      const audioContext = new ((<any>window).AudioContext ||
+        (<any>window).webkitAudioContext)();
       loadSound(
         result.url,
         audioContext,

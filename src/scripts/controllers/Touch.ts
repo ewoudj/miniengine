@@ -41,11 +41,7 @@ export class TouchController {
         this.onTouchStart.bind(this),
         false
       );
-      // (window.addEventListener as WhatWGAddEventListener)(
-      //   'touchmove',
-      //   this.onTouchMove.bind(this),
-      //   { passive: false }
-      // );
+      window.addEventListener('touchmove', this.onTouchMove.bind(this),false);
       window.addEventListener('touchend', this.onTouchEnd.bind(this), false);
     }
   }
