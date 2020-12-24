@@ -19,6 +19,10 @@ export class CanvasRenderer {
   }
 
   public render(): void {
+    const canvas = this.engine.canvas;
+    if(canvas.width !== window.innerWidth || canvas.height !== window.innerHeight){
+      this.resize();
+    }
     this.context.fillStyle = this.engine.canvasColor;
     this.context.fillRect(0, 0, window.innerWidth, window.innerHeight);
     // Render
