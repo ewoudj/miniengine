@@ -27,9 +27,9 @@ export class Menu extends EntityBase {
     this.setItems(this.mainMenu);
 
     window.addEventListener('touchend', ev => {
-      for(let i = 0; i < ev.changedTouches.length; i++){
+      for (let i = 0; i < ev.changedTouches.length; i++) {
         let t = this.getItem(ev.changedTouches[i].clientY);
-        if(t && t.onClick){
+        if (t && t.onClick) {
           t.onClick(this.engine);
         }
       }
@@ -106,18 +106,14 @@ export class Menu extends EntityBase {
   public update(time: number) {
     if (this.mousePosition && this.texts) {
       // Calculate item on the same height as the mouse
-      this.select( this.getItem(this.mousePosition.y) );
+      this.select(this.getItem(this.mousePosition.y));
     }
   }
 
   public getItem(y: number): IText | null {
     let result = null;
     const index = Math.floor((y - this.engine.height / 3) / 60) + 1;
-    if (
-      index > -1 &&
-      index < this.texts.length &&
-      this.texts[index].onClick
-    ) {
+    if (index > -1 && index < this.texts.length && this.texts[index].onClick) {
       result = this.texts[index];
     }
     return result;
