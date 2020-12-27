@@ -28,7 +28,10 @@ export class Menu extends EntityBase {
 
     window.addEventListener('touchend', ev => {
       for (let i = 0; i < ev.changedTouches.length; i++) {
-        let t = this.getItem(ev.changedTouches[i].clientY);
+        let t = this.getItem(
+          (ev.changedTouches[i].clientY - engine.renderer.offsetTop) /
+            engine.renderer.scale
+        );
         if (t && t.onClick) {
           t.onClick(this.engine);
         }
@@ -112,7 +115,10 @@ export class Menu extends EntityBase {
 
   public getItem(y: number): IText | null {
     let result = null;
-    const index = Math.floor((y - this.engine.height / 3) / 60) + 1;
+    const index =
+      Math.floor(
+        (y - this.engine.height / 3) / (this.fontSize + this.lineSpacing)
+      ) + 1;
     if (index > -1 && index < this.texts.length && this.texts[index].onClick) {
       result = this.texts[index];
     }

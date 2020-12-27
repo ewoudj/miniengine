@@ -20,7 +20,10 @@ export class CanvasRenderer {
 
   public render(): void {
     const canvas = this.engine.canvas;
-    if(canvas.width !== window.innerWidth || canvas.height !== window.innerHeight){
+    if (
+      canvas.width !== window.innerWidth ||
+      canvas.height !== window.innerHeight
+    ) {
       this.resize();
     }
     this.context.fillStyle = this.engine.canvasColor;
