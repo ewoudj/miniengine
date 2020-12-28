@@ -1,3 +1,4 @@
+import { afterInput } from './Audio';
 import { Engine } from './Engine';
 import { EntityBase, IText, TextAlignment } from './Entity';
 
@@ -33,6 +34,7 @@ export class Menu extends EntityBase {
             engine.renderer.scale
         );
         if (t && t.onClick) {
+          afterInput();
           t.onClick(this.engine);
         }
       }
