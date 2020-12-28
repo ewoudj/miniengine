@@ -45,6 +45,7 @@ export class TouchController {
         passive: false,
       });
       window.addEventListener('touchend', this.onTouchEnd.bind(this), false);
+      window.addEventListener('touchcancel', this.onTouchEnd.bind(this), false);
     }
   }
 
@@ -159,20 +160,43 @@ export class TouchController {
     c.stroke();
   }
 
+  private validateTouchId(id: number, touches: TouchList): number {
+    let result: number = -1;
+    for (let i = 0; i < touches.length; i++) {
+      if (touches[i].identifier === id) {
+        result = id;
+        break;
+      }
+    }
+    return result;
+  }
+
+  private validateTouches(touches: TouchList) {
+    this.leftTouchID = this.validateTouchId(this.leftTouchID, touches);
+    this.rightTouchID = this.validateTouchId(this.rightTouchID, touches);
+    this.secondRightTouchID = this.validateTouchId(
+      this.secondRightTouchID,
+      touches
+    );
+  }
+
   private onTouchStart(e: TouchEvent) {
+    this.validateTouches(e.touches);
     for (let i = 0, l = e.changedTouches.length; i < l; i++) {
+      // Validate existing IDs (on iOS, when switching between apps they can become invalid)
       const touch = e.changedTouches[i];
       if (this.leftTouchID < 0 && touch.clientX < this.halfWidth) {
+        // Joystick (left) button down
         this.leftTouchID = touch.identifier;
         this.leftTouchStartPos = { x: touch.clientX, y: touch.clientY };
         this.leftTouchPos = { x: touch.clientX, y: touch.clientY };
         this.leftVector = { x: 0, y: 0 };
       } else if (this.inMenuArea(touch.clientX, touch.clientY)) {
-        // Button down event
+        // Menu button down event
         this.secondRightTouchID = touch.identifier;
         this.menuButtonDown = true;
       } else if (this.rightTouchID < 0) {
-        // Button down event
+        // Action (right) button down event
         this.rightTouchID = touch.identifier;
         this.buttonDown = true;
       }
