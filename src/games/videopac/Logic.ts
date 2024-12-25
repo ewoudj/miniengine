@@ -8,7 +8,7 @@ export class Logic extends EntityBase {
       // this.engine.add(new TextEntity(this.engine ,[{
       //         alignment: 'start',
       //         color: '#FFF',
-      //         font: 'CBM64',
+      //         font: SystemFont,
       //         text: 'Ewoud is de beste',
       //         position: {
       //             x: this.engine.width / 2 - 300,

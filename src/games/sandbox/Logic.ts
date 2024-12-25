@@ -1,4 +1,5 @@
 import { EntityBase } from '../../Entity';
+import { SystemFont } from '../../text';
 import { Ship } from './Ship';
 import { TextEntity } from './Text';
 
@@ -20,7 +21,7 @@ export class Logic extends EntityBase {
           {
             alignment: 'start',
             color: '#FFF',
-            font: 'CBM64',
+            font: SystemFont,
             text: 'Ewoud is de beste',
             position: {
               x: this.engine.width / 2 - 300,

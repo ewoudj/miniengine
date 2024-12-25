@@ -1,5 +1,6 @@
 import { Engine } from '../../Engine';
 import { EntityBase } from '../../Entity';
+import { SystemFont } from '../../text';
 
 export class ScoreBar extends EntityBase {
   public name: string = 'scorebar';
@@ -11,7 +12,7 @@ export class ScoreBar extends EntityBase {
     super(engine);
     this.position = {
       x: this.engine.width / 2,
-      y: this.engine.height - 36,
+      y: this.engine.height - 38,
     };
     this.model = [
       {
@@ -26,8 +27,8 @@ export class ScoreBar extends EntityBase {
   public setScore(player1Score: number, player2Score: number) {
     if (!this.texts.length) {
       this.texts = [];
-      this.addScoreBarItem('0', '#F00', 20);
-      this.addScoreBarItem(' 0', '#FF0', this.engine.width - 95);
+      this.addScoreBarItem('0', '#F00', 40);
+      this.addScoreBarItem(' 0', '#FF0', this.engine.width - 115);
       this.addScoreBarItem('LASER WAR', '#FFF', 230);
     }
     this.texts[0].text = player1Score.toString();
@@ -38,7 +39,7 @@ export class ScoreBar extends EntityBase {
     this.texts.push({
       alignment: 'start',
       color,
-      font: 'CBM64',
+      font: SystemFont,
       position: {
         x: offsetLeft,
         y: this.engine.height - 15,

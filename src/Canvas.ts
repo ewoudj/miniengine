@@ -1,6 +1,7 @@
 import { Engine } from './Engine';
 import { IEntity } from './Entity';
 import { IPoint, IRectangle } from './Helpers';
+import { renderText } from './text';
 
 export class CanvasRenderer {
   public offsetLeft: number = 0;
@@ -82,17 +83,43 @@ export class CanvasRenderer {
         this.context.textAlign = t.alignment;
         this.context.fillStyle = t.color;
         if (t.alignment === 'center') {
-          this.context.fillText(
-            t.text,
-            Math.ceil((this.engine.width / 2) * this.scale) + this.offsetLeft,
-            Math.ceil(t.position.y * this.scale) + this.offsetTop
-          );
+          if(t.font === 'SystemFont') {
+            renderText(
+              t.text.toLocaleLowerCase(), 
+              t.color, 
+              (t.size / 10) * this.scale, 
+              this.context, 
+              [ 
+                Math.ceil((this.engine.width / 2) * this.scale) + this.offsetLeft, 
+                Math.ceil((t.position.y - 40) * this.scale) + this.offsetTop ]
+              );
+          }
+          else{
+            this.context.fillText(
+              t.text,
+              Math.ceil((this.engine.width / 2) * this.scale) + this.offsetLeft,
+              Math.ceil(t.position.y * this.scale) + this.offsetTop
+            );
+          }
         } else {
-          this.context.fillText(
-            t.text,
-            Math.ceil(t.position.x * this.scale) + this.offsetLeft,
-            Math.ceil(t.position.y * this.scale) + this.offsetTop
-          );
+          if(t.font === 'SystemFont') {
+          renderText(
+            t.text.toLocaleLowerCase(), 
+            t.color, 
+            (t.size / 10) * this.scale, 
+            this.context, 
+            [ 
+              Math.ceil(t.position.x * this.scale) + this.offsetLeft, 
+              Math.ceil((t.position.y - 40) * this.scale) + this.offsetTop ]
+            );
+          }
+          else {
+            this.context.fillText(
+              t.text,
+              Math.ceil(t.position.x * this.scale) + this.offsetLeft,
+              Math.ceil(t.position.y * this.scale) + this.offsetTop
+            );
+          }
         }
       }
     }

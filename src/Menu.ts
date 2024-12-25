@@ -1,6 +1,7 @@
 import { afterInput } from './Audio';
 import { Engine } from './Engine';
 import { EntityBase, IText, TextAlignment } from './Entity';
+import { SystemFont } from './text';
 
 export interface IMenuItem {
   text: string;
@@ -11,7 +12,7 @@ export interface IMenuItem {
 export class Menu extends EntityBase {
   public alignment: TextAlignment = 'start';
   public color: string = '#AAA';
-  public font: string = 'CBM64';
+  public font: string = SystemFont;
   public fontSize: number = 50;
   public lineSpacing: number = 10;
   public topMost: boolean = true;
