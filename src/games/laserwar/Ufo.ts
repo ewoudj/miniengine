@@ -1,5 +1,6 @@
 import { appearAudio } from '../../Audio';
 import { Engine } from '../../Engine';
+import { Sprite } from '../../Entity';
 import { distance, IPoint, IRectangle } from '../../Helpers';
 import { heuristic } from './ai/Heuristic';
 import { Explosion } from './Explosion';
@@ -7,48 +8,27 @@ import { GameEntity } from './GameEntity';
 import { LaserBeam } from './LaserBeam';
 import { colors, Logic } from './Logic';
 
-const ufoFrames: IRectangle[][] = [
-  [
-    { x: -10, y: -15, w: 20, h: 10 },
-    { x: -10, y: -5, w: 30, h: 10 },
-    { x: -10, y: 5, w: 20, h: 10 },
-  ],
-  [
-    { x: -10, y: -15, w: 20, h: 10 },
-    { x: -20, y: -5, w: 10, h: 10 },
-    { x: 0, y: -5, w: 20, h: 10 },
-    { x: -10, y: 5, w: 20, h: 10 },
-  ],
-  [
-    { x: -10, y: -15, w: 20, h: 10 },
-    { x: -20, y: -5, w: 20, h: 10 },
-    { x: 10, y: -5, w: 10, h: 10 },
-    { x: -10, y: 5, w: 20, h: 10 },
-  ],
-  [
-    { x: -10, y: -15, w: 20, h: 10 },
-    { x: -20, y: -5, w: 30, h: 10 },
-    { x: -10, y: 5, w: 20, h: 10 },
-  ],
-  [
-    { x: -10, y: -15, w: 20, h: 10 },
-    { x: -20, y: -5, w: 40, h: 10 },
-    { x: -10, y: 5, w: 20, h: 10 },
-  ],
-];
-
 export class Ufo extends GameEntity {
   public direction: number = 1;
-  public collisionRect: IRectangle = { x: -20, y: -15, w: 40, h: 30 };
+  public collisionRect: IRectangle = { x: -19, y: -12, w: 38, h: 24 };
   public shoot: boolean = false;
 
   private laserState: number = 10; // 10 = ready, 0 = charging
   private audioDone: boolean = false;
   private invulerability: number = 20;
-  private gunOffset: IPoint = { x: 40, y: 0 };
+  private gunOffset: IPoint = { x: 60, y: 0 };
   private ufoFrame: number = 0;
   private lastTimeCalled: number = 0;
   private lastTimeFrameChanged: number = 0;
+  private sprite: Sprite = {
+    x: 0,
+    y: 16,
+    width: 8,
+    height: 5,
+    file: 'art.png',
+    mirroring: 0,
+  }
+  public sprites: Sprite[] = [this.sprite];
 
   public constructor(
     engine: Engine,
@@ -58,6 +38,9 @@ export class Ufo extends GameEntity {
   ) {
     super(engine);
     this.colorIndex = colorIndex;
+    if(colorIndex === 2) {
+      this.sprite.y = 22;
+    }
     this.direction = -1;
     this.name = name;
     this.type = 'computer';
@@ -160,7 +143,7 @@ export class Ufo extends GameEntity {
   private handleLaser() {
     if (this.shoot && this.laserState === 10) {
       this.laserState = -20;
-      this.gunOffset.x = this.direction === 1 ? 40 : -40;
+      this.gunOffset.x = this.direction === 1 ? 80 : -40;
       this.engine.add(
         new LaserBeam(this.engine, this.direction, this, {
           x: this.position.x + this.gunOffset.x,
@@ -183,15 +166,15 @@ export class Ufo extends GameEntity {
     const frameChangeTimeDelta = time - this.lastTimeFrameChanged;
     if (frameChangeTimeDelta > 80) {
       this.lastTimeFrameChanged = time;
-      this.model = ufoFrames[this.ufoFrame];
       this.ufoFrame += this.direction;
-      if (this.ufoFrame >= ufoFrames.length) {
-        this.ufoFrame = 0;
+      if (this.ufoFrame >= 8) {
+       this.ufoFrame = 0;
       }
       if (this.ufoFrame < 0) {
-        this.ufoFrame = ufoFrames.length - 1;
+       this.ufoFrame = 7;
       }
     }
+    this.sprite.x = this.ufoFrame * 9;
     if (this.ufoFrame === 0) {
       this.direction = 1;
     } else if (this.ufoFrame === 1) {

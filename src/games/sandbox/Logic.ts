@@ -1,5 +1,5 @@
 import { EntityBase } from '../../Entity';
-import { SystemFont } from '../../text';
+import { SystemFont } from '../../Text';
 import { Ship } from './Ship';
 import { TextEntity } from './Text';
 

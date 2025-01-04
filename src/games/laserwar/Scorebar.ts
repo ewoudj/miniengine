@@ -1,6 +1,6 @@
 import { Engine } from '../../Engine';
 import { EntityBase } from '../../Entity';
-import { SystemFont } from '../../text';
+import { SystemFont } from '../../Text';
 
 export class ScoreBar extends EntityBase {
   public name: string = 'scorebar';

@@ -1,5 +1,6 @@
 import { appearAudio } from '../../Audio';
 import { Engine } from '../../Engine';
+import { Mirroring, Sprite } from '../../Entity';
 import { distance, IPoint, IRectangle } from '../../Helpers';
 import { heuristic } from './ai/Heuristic';
 import { Explosion } from './Explosion';
@@ -10,22 +11,25 @@ import { Star } from './Star';
 
 export class Ship extends GameEntity {
   public spawnStar?: Star;
-  public collisionRect: IRectangle = { x: -15, y: -10, w: 30, h: 20 };
+  public collisionRect: IRectangle = { x: -18, y: -17, w: 36, h: 34 };
   public shoot: boolean = false;
   private laserState: number;
   private invulerability: number = 1000;
   private audioDone: boolean = false;
   private gunOffset: IPoint = { x: 40, y: 0 };
-  private rectsRight: IRectangle[] = [
-    { x: -20, y: -15, w: 20, h: 10 },
-    { x: -10, y: -5, w: 30, h: 10 },
-    { x: -20, y: 5, w: 20, h: 10 },
-  ];
-  private rectsLeft: IRectangle[] = [
-    { x: 0, y: -15, w: 20, h: 10 },
-    { x: -20, y: -5, w: 30, h: 10 },
-    { x: 0, y: 5, w: 20, h: 10 },
-  ];
+  private currentFrame: number = 0;
+  private timeNextFrame: number = 0;
+  private frameCount: number = 7;
+
+  private sprite: Sprite = {
+    x: 0,
+    y: 0,
+    width: 8,
+    height: 7,
+    file: 'art.png',
+    mirroring: Mirroring.none
+  };
+
   private lastTimeCalled: number = 0;
 
   public constructor(
@@ -46,10 +50,18 @@ export class Ship extends GameEntity {
     this.name = name;
     this.position = position;
     this.spawnStar = spawnStar;
+    this.sprite.y = colorIndex === 0 ? 0 : 8;
+    this.sprites = [this.sprite];
   }
 
   public update(time: number) {
     const timeDelta = this.getTimeDelta(time);
+    this.timeNextFrame -= timeDelta;
+    if (this.timeNextFrame < 0) {
+      this.timeNextFrame = 150;
+      this.currentFrame = (this.currentFrame + 1) % this.frameCount;
+      this.sprite.x = this.currentFrame * 9;
+    }
     if (this.invulerability) {
       this.invulerability -= timeDelta;
       if (this.invulerability < 0) {
@@ -114,13 +126,13 @@ export class Ship extends GameEntity {
     } else if (this.position.x < previousPosition.x) {
       this.direction = -1;
     }
-    this.model = this.direction === 1 ? this.rectsRight : this.rectsLeft;
+    this.sprite.mirroring = this.direction === 1 ? Mirroring.none : Mirroring.horizontal;
   }
 
   private updateLaser(timeDelta: number) {
     if (this.shoot && this.laserState >= 300) {
       this.laserState = 0;
-      this.gunOffset.x = this.direction === 1 ? 40 : -40;
+      this.gunOffset.x = this.direction === 1 ? 60 : -30;
       this.engine.add(
         new LaserBeam(this.engine, this.direction, this, {
           x: this.position.x + this.gunOffset.x,

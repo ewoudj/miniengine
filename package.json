@@ -8,7 +8,8 @@
     "dev": "vite --port 3007",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "assets": "cd public && pwa-asset-generator icon.svg assets -i ../index.html -m manifest.json --background \"#000\" && sed -i '' 's|\"src\": \"public/assets/|\"src\": \"assets/|g' ./manifest.json"
+    "assets": "cd public && pwa-asset-generator icon.svg assets -i ../index.html -m manifest.json --background \"#000\" && sed -i '' 's|\"src\": \"public/assets/|\"src\": \"assets/|g' ./manifest.json",
+    "deploy": "rm -rf ../ewoud.software/productions/laserwar && cp -r dist ../ewoud.software/productions/laserwar"
   },
   "devDependencies": {
     "@types/babel__traverse": "^7.20.6",

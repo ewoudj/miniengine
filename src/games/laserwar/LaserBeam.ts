@@ -24,7 +24,7 @@ export class LaserBeam extends GameEntity {
     this.direction = direction;
     this.color = '#FFF';
     this.position = position;
-    this.model = [{ x: -20, y: -5, w: 40, h: 10 }];
+    this.model = [{ x: -20, y: -2.5, w: 40, h: 5 }];
     this.collisionRect = this.model[0];
     this.audioDone = false;
   }

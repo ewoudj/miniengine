@@ -45,13 +45,16 @@ export class Star extends GameEntity {
       x: this.engine.width / 2,
       y: this.engine.height * 0.25 - this.bottomOffset,
     };
-    this.collisionRect = { x: -15, y: -15, w: 30, h: 30 };
-    this.model = [
-      { x: -10, y: -20, w: 20, h: 10 },
-      { x: -20, y: -10, w: 40, h: 10 },
-      { x: -20, y: 0, w: 40, h: 10 },
-      { x: -10, y: 10, w: 20, h: 10 },
-    ];
+    this.collisionRect = { x: -14, y: -12, w: 28, h: 24 };
+    this.model = [];
+    this.sprites = [{
+      x: 0,
+      y: 28,
+      width: 6,
+      height: 5,
+      file: 'art.png',
+      mirroring: 0,
+    }];
   }
 
   public render(): void {
@@ -93,6 +96,7 @@ export class Star extends GameEntity {
           break;
         }
       }
+      this.sprites[0].x = this.colorIndex * 7;
     }
 
     // 0 is center star 1; 1, 2, 3, 4 are its sub-stars

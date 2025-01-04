@@ -1,7 +1,7 @@
 import { afterInput } from './Audio';
 import { Engine } from './Engine';
 import { EntityBase, IText, TextAlignment } from './Entity';
-import { SystemFont } from './text';
+import { SystemFont } from './Text';
 
 export interface IMenuItem {
   text: string;

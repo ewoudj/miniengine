@@ -1,7 +1,14 @@
 import { Engine } from './Engine';
 import { IEntity } from './Entity';
 import { IPoint, IRectangle } from './Helpers';
-import { renderText } from './text';
+import { renderText } from './Text';
+
+const image = new Image();
+image.src = 'art.png';
+image.onload = () => {
+  imageLoaded = true;
+};
+let imageLoaded: boolean = false;
 
 export class CanvasRenderer {
   public offsetLeft: number = 0;
@@ -60,21 +67,98 @@ export class CanvasRenderer {
     if (this.engine.touchable && this.offsetTop > 40) {
       this.offsetTop = 40;
     }
-    this.offsetLeft = Math.ceil(
-      (this.engine.canvas.width - this.engine.width * this.scale) / 2
-    );
+    this.offsetLeft = ((this.engine.canvas.width / this.scale) - (this.engine.width )) / 2;
     this.engine.controller.resize();
   }
 
   private renderEntity(entity: IEntity): void {
     entity.render(this.context);
-    if (entity.model) {
+    if (entity.model ) {
       this.drawRects(
         { x: entity.position.x, y: entity.position.y },
         entity.model,
         entity.color,
         true
       );
+    }
+    // if(entity.collisionRect){
+    //   this.drawRects(
+    //     { x: entity.position.x, y: entity.position.y },
+    //     [entity.collisionRect],
+    //     '#FF0000',
+    //     false
+    //   );
+    // }
+    if(entity.sprites) {
+      // Render sprites
+      for (const sprite of entity.sprites) {
+        if(imageLoaded) {
+          this.context.save();
+          this.context.imageSmoothingEnabled = false;
+          
+          const correctX = (sprite.width * 5) / 2;
+          const correctY = (sprite.height * 5) / 2;
+
+          this.context.translate(
+            (entity.position.x + this.offsetLeft - correctX) * this.scale,
+            (entity.position.y + this.offsetTop - correctY) * this.scale
+          );
+          this.context.scale(5 * this.scale, 5 * this.scale);
+          if (sprite.mirroring === 1) {
+            this.context.scale(-1, 1);
+            this.context.drawImage(
+              image,
+              sprite.x,
+              sprite.y,
+              sprite.width,
+              sprite.height,
+              -sprite.width,
+              0,
+              sprite.width,
+              sprite.height
+            );
+          } else if (sprite.mirroring === 2) {
+            this.context.scale(1, -1);
+            this.context.drawImage(
+              image,
+              sprite.x,
+              sprite.y,
+              sprite.width,
+              sprite.height,
+              0,
+              -sprite.height,
+              sprite.width,
+              sprite.height
+            );
+          } else if (sprite.mirroring === 3) {
+            this.context.scale(-1, -1);
+            this.context.drawImage(
+              image,
+              sprite.x,
+              sprite.y,
+              sprite.width,
+              sprite.height,
+              -sprite.width,
+              -sprite.height,
+              sprite.width,
+              sprite.height
+            );
+          } else {
+            this.context.drawImage(
+              image,
+              sprite.x,
+              sprite.y,
+              sprite.width,
+              sprite.height,
+              0,
+              0,
+              sprite.width,
+              sprite.height
+            );
+          }
+          this.context.restore();
+        };
+      }
     }
     if (entity.texts) {
       for (const t of entity.texts) {
@@ -90,8 +174,8 @@ export class CanvasRenderer {
               (t.size / 10) * this.scale, 
               this.context, 
               [ 
-                Math.ceil((this.engine.width / 2) * this.scale) + this.offsetLeft, 
-                Math.ceil((t.position.y - 40) * this.scale) + this.offsetTop ]
+                ((this.engine.width / 2) + this.offsetLeft) * this.scale, 
+                100 ]// ((t.position.y + this.offsetTop) * this.scale) + ((t.size / 10) * this.scale) ]
               );
           }
           else{
@@ -109,8 +193,8 @@ export class CanvasRenderer {
             (t.size / 10) * this.scale, 
             this.context, 
             [ 
-              Math.ceil(t.position.x * this.scale) + this.offsetLeft, 
-              Math.ceil((t.position.y - 40) * this.scale) + this.offsetTop ]
+              (t.position.x + this.offsetLeft) * this.scale, 
+              ((t.position.y - 40) + this.offsetTop ) * this.scale ]
             );
           }
           else {
@@ -131,31 +215,44 @@ export class CanvasRenderer {
     color: string,
     fill: boolean
   ): void {
-    rects.forEach(r => this.drawRect(offset, r, color, fill));
+    this.context.save();
+    if(fill) {
+      this.context.fillStyle = color;
+    }
+    else {
+      this.context.strokeStyle = color;
+    }
+    this.context.scale(this.scale, this.scale);
+    this.context.translate(offset.x + this.offsetLeft, offset.y + this.offsetTop);
+    rects.forEach(r => this.drawRect(r, fill));
+    this.context.restore();
   }
 
   private drawRect(
-    offset: IPoint,
     rect: IRectangle,
-    color: string,
     fill: boolean
   ): void {
     if (fill) {
-      this.context.fillStyle = color;
       this.context.fillRect(
-        (rect.x + offset.x) * this.scale + this.offsetLeft,
-        (rect.y + offset.y) * this.scale + this.offsetTop,
-        rect.w * this.scale,
-        (rect.h + 2) * this.scale
+        rect.x,
+        rect.y,
+        rect.w,
+        rect.h
+      );
+      this.context.fillRect(
+        rect.x,
+        rect.y,
+        rect.w,
+        rect.h
       );
     } else {
-      this.context.strokeStyle = color;
       this.context.strokeRect(
-        (rect.x + offset.x) * this.scale,
-        (rect.y + offset.y) * this.scale,
-        rect.w * this.scale,
-        rect.h * this.scale
+        rect.x ,
+        rect.y,
+        rect.w,
+        rect.h
       );
+
     }
   }
 }
