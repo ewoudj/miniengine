@@ -66,7 +66,7 @@ export class Ufo extends GameEntity {
     this.position = this.calculateMovement(
       this.position,
       this.mousePosition,
-      10,
+      6,
       timeDelta
     );
     this.handleLaser();
@@ -143,7 +143,7 @@ export class Ufo extends GameEntity {
   private handleLaser() {
     if (this.shoot && this.laserState === 10) {
       this.laserState = -20;
-      this.gunOffset.x = this.direction === 1 ? 80 : -40;
+      this.gunOffset.x = this.direction === 1 ? 40 : -40;
       this.engine.add(
         new LaserBeam(this.engine, this.direction, this, {
           x: this.position.x + this.gunOffset.x,

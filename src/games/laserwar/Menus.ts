@@ -5,6 +5,7 @@ import { Logic } from './Logic';
 export const mainMenu: IMenuItem[] = [
   {
     text: '    SINGLE PLAYER',
+    default: true,
     onClick: (engine: Engine): void => {
       (engine.logic as Logic).startSinglePlayerGame();
     },
@@ -96,6 +97,7 @@ const settingsMenu: IMenuItem[] = [
   },
   {
     text: '      MAIN MENU',
+    default: true,
     onClick: (engine: Engine) => {
       (engine.logic as Logic).menu.setItems(mainMenu);
     },
@@ -111,6 +113,7 @@ export const gameOverMenu: IMenuItem[] = [
   },
   {
     text: '      PLAY AGAIN',
+    default: true,
     onClick: (engine: Engine) => {
       (engine.logic as Logic).startSinglePlayerGame();
     },

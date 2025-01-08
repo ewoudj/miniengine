@@ -61,9 +61,7 @@ export class CanvasRenderer {
     const scaleh = canvas.width / this.engine.width;
     const scalev = canvas.height / this.engine.height;
     this.scale = scaleh < scalev ? scaleh : scalev;
-    this.offsetTop = Math.ceil(
-      (canvas.height - this.engine.height * this.scale) / 2
-    );
+    this.offsetTop = ((canvas.height / this.scale) - this.engine.height) / 2;
     if (this.engine.touchable && this.offsetTop > 40) {
       this.offsetTop = 40;
     }

@@ -118,7 +118,7 @@ export class Ship extends GameEntity {
     this.position = this.calculateMovement(
       this.position,
       this.mousePosition,
-      10,
+      6,
       timeDelta
     );
     if (this.position.x > previousPosition.x) {
@@ -132,7 +132,7 @@ export class Ship extends GameEntity {
   private updateLaser(timeDelta: number) {
     if (this.shoot && this.laserState >= 300) {
       this.laserState = 0;
-      this.gunOffset.x = this.direction === 1 ? 60 : -30;
+      this.gunOffset.x = this.direction === 1 ? 40 : -40;
       this.engine.add(
         new LaserBeam(this.engine, this.direction, this, {
           x: this.position.x + this.gunOffset.x,

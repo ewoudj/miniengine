@@ -1,6 +1,6 @@
 import { CanvasRenderer } from './Canvas';
 import { calculateCollisions } from './Collisions';
-import { MouseController } from './controllers/Mouse';
+import { KeyboardController } from './controllers/Keyboard';
 import { TouchController } from './controllers/Touch';
 import { IEntity } from './Entity';
 // import { Logic as BallBrickerLogic } from './games/ballbricker/Logic';
@@ -47,6 +47,8 @@ export class Engine {
   public controller: IController;
   private pageColor: string = '#000';
   private startTime: number = new Date().getTime();
+  private readonly keyboardController: KeyboardController = new KeyboardController(this);
+  private readonly touchController: TouchController = new TouchController(this);
 
   public constructor() {
     // Disable selection of text/elements in the browser
@@ -60,8 +62,8 @@ export class Engine {
     this.canvas.style.position = 'absolute';
     this.canvas.style.backgroundColor = '#000';
     this.controller = this.touchable
-      ? new TouchController(this)
-      : new MouseController(this);
+      ? this.touchController
+      : this.keyboardController;
     this.renderer = new CanvasRenderer(this);
     // Time as number
     this.startTime = new Date().getTime();

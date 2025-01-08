@@ -11,6 +11,7 @@ export interface IText {
   position: IPoint;
   onClick?: (engine: Engine) => void;
   size: number;
+  default?: boolean;
 }
 
 export interface IEntity {
